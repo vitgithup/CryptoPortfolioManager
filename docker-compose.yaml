@@ -1,0 +1,41 @@
+version: '1.0'
+
+services:
+  frontend_port:
+    container_name: frontend_port
+    image: frontend_port
+    build:
+      context: ./frontend
+      dockerfile: frontend_port.dockerfile
+    ports:
+      - 3001:3001
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:4001
+    restart: always
+    depends_on:
+      - backend_port
+  backend_port:
+    container_name: backend_port
+    image: backend_port
+    build:
+      context: ./backend
+      dockerfile: backend_port.dockerfile
+    ports:
+      - 4001:4001
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db_port:5432/postgres?schema=public
+  db_port:
+    container_name: db_port
+    image: postgres:12
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata: {}
